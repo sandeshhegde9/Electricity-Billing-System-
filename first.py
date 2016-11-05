@@ -6,8 +6,11 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 
-db=MySQLdb.connect(host='localhost',user='root',passwd='sandesh123',db='ElectricityBill')
+db=MySQLdb.connect(host='localhost',user='root',passwd='sandesh123',db='blah')
 cur=db.cursor()
+username=''
+address=''
+userid=''
 
 #Design of starting screen.
 class StartScreen(FloatLayout):
@@ -60,7 +63,23 @@ class AdminLoginScreen(FloatLayout):
 	
 	def adminlogin(self,a):
 		#Run query to check for password. 
-		print "jhgd"
+		query="select * from admin where password='"+str(self.password.text)+"';"
+
+		result=''
+                try:
+			cur.execute(query)
+			result=cur.fetchall()
+		except:
+			 self.add_widget(Label(text='Please enter correct password',pos=(400,130),size_hint=(None,None)))
+		if len(result)<1:	 
+			self.add_widget(Label(text='Please enter correct password',pos=(400,130),size_hint=(None,None)))
+		else:
+			#Store the user info to display in next window in global variables.
+			
+
+			#Close this app and open next app.
+			App.get_running_app().stop()
+
 	def goback(self,a):
 		App.get_running_app().stop()
 		MyApp().run()
@@ -93,19 +112,79 @@ class UserLoginScreen(FloatLayout):
 
         def userlogin(self,a):
                 #Run query to check for userid and password. 
-                print "jhgd"
+		query="select user_id,name,address from users where user_id="+str(self.userid.text)+" and password='"+str(self.password.text)+"';"
+		result=''
+                try:
+			cur.execute(query)
+			result=cur.fetchall()
+		except:
+			 self.add_widget(Label(text='Please enter username and password correctly.',pos=(400,130),size_hint=(None,None)))
+		if len(result)<1:	 
+			self.add_widget(Label(text='Please enter username and password correctly.',pos=(400,130),size_hint=(None,None)))
+		else:
+			#Store the user info to display in next window in global variables.
+			userid=result[0][0]
+			username=result[0][1]
+			address=result[0][2]
+
+			#Close this app and open next app.
+			App.get_running_app().stop()
+			UserApp().run()
+
 	def goback(self,a):
 		App.get_running_app().stop()
 		MyApp().run()
-
-
-
 
 class UserLogin(App):
 
     def build(self):
         return UserLoginScreen()
 #END userlogin
+
+#Design of USER SCREEN.
+class UserScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(UserScreen, self).__init__(**kwargs)
+                self.cols = 2
+                self.but=Button(text="Login",font_size=14,pos=(250,200),size_hint=(None,None),width=100,height=30)
+		self.but.bind(on_press=self.adminlogin)
+                self.add_widget(Label(text='Password:',pos=(200,240),size_hint=(None,None)))
+                self.password = TextInput(password=True, multiline=False,size_hint=(None,None),width=300,height=35,pos=(300,270),focus=True)
+                self.add_widget(self.password)
+                self.add_widget(self.but)
+		self.bck=Button(text="Back",font_size=14,pos=(350,200),size_hint=(None,None),width=100,height=30)
+		self.bck.bind(on_press=self.goback)
+		self.add_widget(self.bck)
+	
+	def adminlogin(self,a):
+		#Run query to check for password. 
+		query="select * from admin where password='"+str(self.password.text)+"';"
+
+		result=''
+                try:
+			cur.execute(query)
+			result=cur.fetchall()
+		except:
+			 self.add_widget(Label(text='Please enter correct password',pos=(400,130),size_hint=(None,None)))
+		if len(result)<1:	 
+			self.add_widget(Label(text='Please enter correct password',pos=(400,130),size_hint=(None,None)))
+		else:
+			#Store the user info to display in next window in global variables.
+			
+
+			#Close this app and open next app.
+			App.get_running_app().stop()
+
+	def goback(self,a):
+		App.get_running_app().stop()
+		UserLogin().run()
+
+
+class UserApp(App):
+
+    def build(self):
+        return UserScreen()
+#END USER SCREEN
 
 
 if __name__ == '__main__':
