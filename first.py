@@ -154,7 +154,8 @@ class UserScreen(FloatLayout):
 		self.logoutButton=Button(text='Logout',font_size=14,size_hint=(None,None),height=30,width=60,pos=(600,500))
 		self.logoutButton.bind(on_press=self.logout)
 		self.add_widget(self.logoutButton)
-		self.add_widget(Label(text='Bills to be paid:',pos=(150,400),size_hint=(None,None)))
+		self.lbl1=Label(text='Bills to be paid:',pos=(150,400),size_hint=(None,None))
+		self.add_widget(self.lbl1)
 		query='select * from bill where user_id="'+str(userid)+'"and status="unpaid";'
 		st='Bill_no      Amount      Due Date        Status\n\n\n'
 		try:
@@ -165,10 +166,11 @@ class UserScreen(FloatLayout):
 				st+=str(row[0])+'             '+str(row[2])+'             '+str(row[3])+'          '+str(row[4])
 				st+='\n\n'
 				tot+=row[2]
-			st+='\n\nTotal Amount:'+str(tot)
+			st+='\n\nTotal Amount: '+str(tot)
 		except:
 			print 'jhs'
-		self.add_widget(Label(text=st,pos=(400,280),size_hint=(None,None)))
+		self.lbl2=Label(text=st,pos=(400,280),size_hint=(None,None))
+		self.add_widget(self.lbl2)
 		self.payButton=Button(text='Make Payment',font_size=14,pos=(320,100),size_hint=(None,None),height=30,width=100)
 		self.payButton.bind(on_press=self.pay)
 		self.add_widget(self.payButton)
@@ -185,7 +187,14 @@ class UserScreen(FloatLayout):
 			cur.execute(query)
 			result=cur.fetchall()
 			for row in result:
-				st+=str(row[0])+'         '+str(row[1])+'\n\n'
+				st+=str(row[0])+'               '+str(row[1])+'\n'
+			self.remove_widget(self.lbl2)
+			self.lbl1.text="Payments:"
+			self.lbl3=Label(text=st,pos=(400,280),size_hint=(None,None))
+			self.add_widget(self.lbl3)
+
+		#Remove the old label and display new label.
+		except:print 'Something went wrong'
 
 	def pay(self,a):
 		App.get_running_app().stop()
