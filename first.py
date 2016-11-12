@@ -80,6 +80,7 @@ class AdminLoginScreen(FloatLayout):
 
 			#Close this app and open next app.
 			App.get_running_app().stop()
+			AdminApp().run()
 
 	def goback(self,a):
 		App.get_running_app().stop()
@@ -91,6 +92,317 @@ class AdminLogin(App):
     def build(self):
         return AdminLoginScreen()
 #END adminlogin
+
+#Design of admin screen.
+class AdminScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(AdminScreen, self).__init__(**kwargs)
+                self.cols = 2
+		self.add_widget(Label(text='Admin',font_size=20,pos=(600,500),size_hint=(None,None)))
+             	self.adduserButton=Button(text='Add User',font_size=14,pos=(350,500),size_hint=(None,None),height=30,width=200)
+		self.adduserButton.bind(on_press=self.adduser)
+		self.add_widget(self.adduserButton)
+		
+		self.addserviceButton=Button(text='Add Service',font_size=14,pos=(350,450),size_hint=(None,None),height=30,width=200)
+		self.addserviceButton.bind(on_press=self.addservice)
+		self.add_widget(self.addserviceButton)
+
+		self.deleteuserButton=Button(text='Delete User',font_size=14,pos=(350,400),size_hint=(None,None),height=30,width=200)
+		self.deleteuserButton.bind(on_press=self.deleteuser)
+		self.add_widget(self.deleteuserButton)
+
+		self.deleteserviceButton=Button(text='Delete Service',font_size=14,pos=(350,350),size_hint=(None,None),height=30,width=200)
+		self.deleteserviceButton.bind(on_press=self.deleteservice)
+		self.add_widget(self.deleteserviceButton)
+
+		self.addbillButton=Button(text='Add Bill',font_size=14,pos=(350,300),size_hint=(None,None),height=30,width=200)
+		self.addbillButton.bind(on_press=self.addbill)
+		self.add_widget(self.addbillButton)
+
+		self.billButton=Button(text='Get Unpaid bills',font_size=14,pos=(350,250),size_hint=(None,None),height=30,width=200)
+		self.billButton.bind(on_press=self.getdue)
+		self.add_widget(self.billButton)
+
+		self.bck=Button(text="Logout",font_size=14,pos=(350,100),size_hint=(None,None),width=100,height=30)
+		self.bck.bind(on_press=self.goback)
+		self.add_widget(self.bck)
+
+	def adduser(self,a):
+		App.get_running_app().stop()
+		AddUser().run()
+
+	def deleteuser(self,a):
+		App.get_running_app().stop()
+		DeleteUser().run()
+
+	def addservice(self,a):
+		App.get_running_app().stop()
+		AddServiceApp().run()
+	
+	def deleteservice(self,a):
+		App.get_running_app().stop()
+		DeleteServiceApp().run()
+	
+	def addbill(felf,a):
+		App.get_running_app().stop()
+		AddBillApp().run()
+
+	def getdue(self,a):
+		print ''
+		#Fetch and display unpaid bills.
+
+	def goback(self,a):
+		App.get_running_app().stop()
+		AdminLogin().run()
+
+
+class AdminApp(App):
+
+    def build(self):
+        return AdminScreen()
+#END adminScreen
+
+#Design of AddBill screen.
+class AddBillScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(AddBillScreen, self).__init__(**kwargs)
+                self.cols = 2
+               
+
+		self.userid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,400),focus=True,text="User ID")
+                self.add_widget(self.userid)
+
+		self.serid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,350),focus=True,text="Service ID")
+                self.add_widget(self.serid)
+
+		self.amt = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,300),focus=True,text="Meter Reading")
+                self.add_widget(self.amt)
+		
+		self.bck=Button(text="Back",font_size=14,pos=(600,500),size_hint=(None,None),width=100,height=30)
+		self.bck.bind(on_press=self.goback)
+		
+		self.submit=Button(text="Submit",font_size=14,pos=(320,250),size_hint=(None,None),width=100,height=30)
+		self.submit.bind(on_press=self.submitt)
+		self.add_widget(self.submit)
+		self.add_widget(self.bck)
+	
+	def submitt(self,a):
+		query=''
+		print query
+		try:
+			cur.execute(query)
+			db.commit()
+			self.add_widget(Label(text="Success",size_hint=(None,None),pos=(320,200)))
+			self.userid.text='User ID'
+			self.serid.text='Servie Id'
+			self.amt.text="Meter Reading"
+		except:
+			self.add_widget(Label(text="Please enter Correct User ID and service ID.",size_hint=(None,None),pos=(320,200)))
+
+	def goback(self,a):
+		App.get_running_app().stop()
+		AdminApp().run()
+
+
+class AddBillApp(App):
+
+    def build(self):
+        return AddBillScreen()
+#END Addservice
+
+
+#Design of DeleteSerivice screen.
+class DeleteServiceScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(DeleteServiceScreen, self).__init__(**kwargs)
+                self.cols = 2
+               
+
+		self.userid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,400),focus=True,text="User ID")
+                self.add_widget(self.userid)
+
+		self.serid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,350),focus=True,text="Service ID")
+                self.add_widget(self.serid)
+
+
+		self.bck=Button(text="Back",font_size=14,pos=(600,500),size_hint=(None,None),width=100,height=30)
+		self.bck.bind(on_press=self.goback)
+		
+		self.submit=Button(text="Delete",font_size=14,pos=(320,300),size_hint=(None,None),width=100,height=30)
+		self.submit.bind(on_press=self.submitt)
+		self.add_widget(self.submit)
+		self.add_widget(self.bck)
+	
+	def submitt(self,a):
+		query='delete from enrollment where user_id='+str(self.userid.text)+' and service_id='+str(self.serid.text)+';'
+		print query
+		try:
+			cur.execute(query)
+			db.commit()
+			self.add_widget(Label(text="Success",size_hint=(None,None),pos=(320,250)))
+			self.userid.text='User ID'
+			self.serid.text='Servie Id'
+		except:
+			self.add_widget(Label(text="Please enter Correct User ID and service ID.",size_hint=(None,None),pos=(320,250)))
+
+	def goback(self,a):
+		App.get_running_app().stop()
+		AdminApp().run()
+
+
+class DeleteServiceApp(App):
+
+    def build(self):
+        return DeleteServiceScreen()
+#END Deleteservice
+
+
+#Design of AddSerivice screen.
+class AddServiceScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(AddServiceScreen, self).__init__(**kwargs)
+                self.cols = 2
+               
+
+		self.userid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,400),focus=True,text="User ID")
+                self.add_widget(self.userid)
+
+		self.serid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,350),focus=True,text="Service ID")
+                self.add_widget(self.serid)
+
+
+		self.bck=Button(text="Back",font_size=14,pos=(600,500),size_hint=(None,None),width=100,height=30)
+		self.bck.bind(on_press=self.goback)
+		
+		self.submit=Button(text="ADD",font_size=14,pos=(320,300),size_hint=(None,None),width=100,height=30)
+		self.submit.bind(on_press=self.submitt)
+		self.add_widget(self.submit)
+		self.add_widget(self.bck)
+	
+	def submitt(self,a):
+		query='insert into enrollment values('+str(self.userid.text)+','+str(self.serid.text)+',0);'
+		print query
+		try:
+			cur.execute(query)
+			db.commit()
+			self.add_widget(Label(text="Success",size_hint=(None,None),pos=(320,250)))
+			self.userid.text='User ID'
+			self.serid.text='Servie Id'
+		except:
+			self.add_widget(Label(text="Please enter Correct User ID and service ID.",size_hint=(None,None),pos=(320,250)))
+
+	def goback(self,a):
+		App.get_running_app().stop()
+		AdminApp().run()
+
+
+class AddServiceApp(App):
+
+    def build(self):
+        return AddServiceScreen()
+#END Addservice
+
+
+#Design of DeleteUser screen.
+class DeleteUserScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(DeleteUserScreen, self).__init__(**kwargs)
+                self.cols = 2
+               
+
+		self.userid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(300,400),focus=True,text="User ID")
+                self.add_widget(self.userid)
+
+		self.bck=Button(text="Back",font_size=14,pos=(600,500),size_hint=(None,None),width=100,height=30)
+		self.bck.bind(on_press=self.goback)
+		
+		self.submit=Button(text="Delete User",font_size=14,pos=(320,350),size_hint=(None,None),width=100,height=30)
+		self.submit.bind(on_press=self.submitt)
+		self.add_widget(self.submit)
+		self.add_widget(self.bck)
+	
+	def submitt(self,a):
+		query='delete from users where user_id='+str(self.userid.text)+';'
+		print query
+		try:
+			cur.execute(query)
+			db.commit()
+			self.add_widget(Label(text="Success",size_hint=(None,None),pos=(320,280)))
+			self.userid.text='User ID'
+		except:
+			self.add_widget(Label(text="Please enter Correct User ID.",size_hint=(None,None),pos=(320,250)))
+
+	def goback(self,a):
+		App.get_running_app().stop()
+		AdminApp().run()
+
+
+class DeleteUser(App):
+
+    def build(self):
+        return DeleteUserScreen()
+#END Deleteuser
+
+#Design of AddUser screen.
+class AddUserScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(AddUserScreen, self).__init__(**kwargs)
+                self.cols = 2
+               
+
+		self.userid = TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(40,500),focus=True,text="User ID")
+                self.add_widget(self.userid)
+		#Add textBoxes here. u left coding coz submission is postponed. moron
+		self.password=TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(270,500),focus=True,text="password")
+		self.add_widget(self.password)
+
+		self.name=TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(40,460),focus=True,text="Name")
+		self.add_widget(self.name)
+		
+		self.address=TextInput(multiline=True,size_hint=(None,None),width=200,height=30,pos=(270,460),focus=True,text="Address")
+		self.add_widget(self.address)
+
+		self.ph=TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(40,420),focus=True,text="Phone No")
+		self.add_widget(self.ph)
+
+		self.mail=TextInput(multiline=False,size_hint=(None,None),width=200,height=30,pos=(270,420),focus=True,text="Email")
+		self.add_widget(self.mail)
+
+		self.bck=Button(text="Back",font_size=14,pos=(600,500),size_hint=(None,None),width=100,height=30)
+		self.bck.bind(on_press=self.goback)
+		
+		self.submit=Button(text="Submit",font_size=14,pos=(320,350),size_hint=(None,None),width=100,height=30)
+		self.submit.bind(on_press=self.submitt)
+		self.add_widget(self.submit)
+		self.add_widget(self.bck)
+	
+	def submitt(self,a):
+		query="insert into users values("+str(self.userid.text)+",'"+str(self.password.text)+"','"+str(self.name.text)+"','"+str(self.address.text)+"','"+str(self.ph.text)+"','"+str(self.mail.text)+"');"
+		print query
+		try:
+			cur.execute(query)
+			db.commit()
+			self.add_widget(Label(text="Success",size_hint=(None,None),pos=(320,280)))
+			self.userid.text='User ID'
+			self.password.text='password'
+			self.name.text='Name'
+			self.address.text="Address"
+			self.ph.text="Phone no"
+			self.mail.text="Email"
+		except:
+			self.add_widget(Label(text="Please enter all fields correctly.",size_hint=(None,None),pos=(320,250)))
+
+	def goback(self,a):
+		App.get_running_app().stop()
+		AdminApp().run()
+
+
+class AddUser(App):
+
+    def build(self):
+        return AddUserScreen()
+#END adduser
+
 
 #Design of userlogin screen.
 class UserLoginScreen(FloatLayout):
