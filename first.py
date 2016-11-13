@@ -148,7 +148,8 @@ class AdminScreen(FloatLayout):
 		AddBillApp().run()
 
 	def getdue(self,a):
-		print ''
+		App.get_running_app().stop()
+		BillApp().run()
 		#Fetch and display unpaid bills.
 
 	def goback(self,a):
@@ -161,6 +162,41 @@ class AdminApp(App):
     def build(self):
         return AdminScreen()
 #END adminScreen
+
+#Design of get due bills screen.
+class BillScreen(FloatLayout):
+        def __init__(self, **kwargs):
+                super(BillScreen, self).__init__(**kwargs)
+                self.cols = 2
+               
+		self.bck=Button(text="Back",font_size=14,pos=(600,500),size_hint=(None,None),width=100,height=30)
+		self.add_widget(self.bck)
+		self.bck.bind(on_press=self.goback)
+	
+		query='select u.user_id,u.name,b.bill_no,b.amt,u.ph_no,u.email from users u,bill b,enrollment e where u.user_id=b.user_id and b.status="unpaid";'
+		try:
+			cur.execute(query)
+			result=cur.fetchall()
+			st='User ID               Name               Bill No.            Amount             Phone               Email\n\n\n'
+			for row in result:
+				st+=str(row[0])+'             '+str(row[1])+'             '+str(row[2])+'          '+str(row[3])+'             '+str(row[4])+'              '+str(row[5])
+				st+='\n\n'
+			self.add_widget(Label(text=st,color=[255,255,255,8]))
+
+		except:print ''
+	
+	def goback(self,a):
+		App.get_running_app().stop()
+		AdminApp().run()
+
+
+class BillApp(App):
+
+    def build(self):
+        return BillScreen()
+#END Deleteservice
+
+
 
 #Design of AddBill screen.
 class AddBillScreen(FloatLayout):
@@ -187,17 +223,38 @@ class AddBillScreen(FloatLayout):
 		self.add_widget(self.bck)
 	
 	def submitt(self,a):
-		query=''
-		print query
+		query='select reading from enrollment where user_id='+str(self.userid.text)+' and service_id='+str(self.serid.text)+';'
+		lb1=Label(text="",size_hint=(None,None),pos=(320,170))
+		self.add_widget(lb1)
 		try:
 			cur.execute(query)
+			res=cur.fetchall()
+			res=res[0][0]
+			amount=int(self.amt.text)-res
+			if amount<0:j=1/0
+
+			query='select cost from service where service_id='+str(self.serid.text)+';'
+			cur.execute(query)
+			q=cur.fetchall()
+			amount=amount*float(q[0][0])
+			query='select max(bill_no) from bill;'
+			cur.execute(query)
+			res=cur.fetchall()
+			b_no=res[0][0]+1
+			
+			query='insert into bill values('+str(b_no)+','+str(self.userid.text)+','+str(amount)+',0000-00-00,"unpaid");'
+			cur.execute(query)
+			query='update enrollment set reading='+str(self.amt.text)+' where user_id='+str(self.userid.text)+' and service_id='+str(self.serid.text)+';'
+	
+			cur.execute(query)
 			db.commit()
-			self.add_widget(Label(text="Success",size_hint=(None,None),pos=(320,200)))
+			lb1.text='Success'
 			self.userid.text='User ID'
 			self.serid.text='Servie Id'
 			self.amt.text="Meter Reading"
+
 		except:
-			self.add_widget(Label(text="Please enter Correct User ID and service ID.",size_hint=(None,None),pos=(320,200)))
+			lb1.text='Please input valid values.'
 
 	def goback(self,a):
 		App.get_running_app().stop()
